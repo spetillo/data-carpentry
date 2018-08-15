@@ -5,7 +5,7 @@ import iris.plot as iplt
 import iris.coord_categorisation
 import cmocean
 import numpy
-
+import calendar
 
 def read_data(fname, month):
     """Read an input data file"""
@@ -27,13 +27,17 @@ def convert_pr_units(cube):
     return cube
 
 
-def plot_data(cube, month, gridlines=False):
+def plot_data(cube, month, gridlines=False, levels=None):
+#def plot_data(cube, month, gridlines=False):
     """Plot the data."""
         
     fig = plt.figure(figsize=[12,5])    
     iplt.contourf(cube, cmap=cmocean.cm.haline_r, 
-                  levels=numpy.arange(0, 10),
+                  levels=levels,
                   extend='max')
+    #iplt.contourf(cube, cmap=cmocean.cm.haline_r, 
+    #              levels=numpy.arange(0, 10),
+    #              extend='max')
 
     plt.gca().coastlines()
     if gridlines:
@@ -51,7 +55,9 @@ def main(inargs):
     cube = read_data(inargs.infile, inargs.month)    
     cube = convert_pr_units(cube)
     clim = cube.collapsed('time', iris.analysis.MEAN)
-    plot_data(clim, inargs.month)
+    plot_data(clim, inargs.month, gridlines=inargs.gridlines,
+             levels=inargs.cbar_levels)
+    #plot_data(clim, inargs.month, gridlines=inargs.gridlines)
     plt.savefig(inargs.outfile)
 
 
@@ -60,8 +66,16 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=description)
     
     parser.add_argument("infile", type=str, help="Input file name")
-    parser.add_argument("month", type=str, help="Month to plot")
+    parser.add_argument("month", type=str, help="Month to plot", choices=calendar.month_abbr[1:])
+    #parser.add_argument("month", type=str, help="Month to plot", choices=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'])
     parser.add_argument("outfile", type=str, help="Output file name")
+    parser.add_argument("--gridlines", help="Add gridlines if specified",
+                    action="store_true")
+    #parser.add_argument("-cmin", type=int, help="Specify colorbar min tick level")
+    #parser.add_argument("-cmax", type=int, help="Specify colorbar max tick level")
+    parser.add_argument("--cbar_levels", type=float, nargs='*', default=None,
+                        help='list of levels / tick marks to appear on the colourbar')
+
 
     args = parser.parse_args()
     
