@@ -4,6 +4,7 @@ import calendar
 
 import numpy
 import matplotlib.pyplot as plt
+import cmdline_provenance as cmdprov
 import iris
 import iris.plot as iplt
 import iris.coord_categorisation
@@ -79,6 +80,12 @@ def main(inargs):
     plot_data(clim, inargs.month, gridlines=inargs.gridlines,
              levels=inargs.cbar_levels)
     #plot_data(clim, inargs.month, gridlines=inargs.gridlines)
+    #previous_history = clim.attributes['history']
+    #new_record = cmdprov.new_log()
+    #cmdprov.write_log(inargs.outfile, new_record)
+    new_log = cmdprov.new_log(infile_history={inargs.infile: cube.attributes['history']})
+    fname, extension = inargs.outfile.split('.')
+    cmdprov.write_log(fname+'.txt', new_log)
     plt.savefig(inargs.outfile)
 
 
