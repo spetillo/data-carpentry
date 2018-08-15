@@ -9,6 +9,9 @@ import iris.plot as iplt
 import iris.coord_categorisation
 import cmocean
 
+import warnings
+warnings.filterwarnings('ignore')
+
 def read_data(fname, month):
     """Read an input data file"""
     
